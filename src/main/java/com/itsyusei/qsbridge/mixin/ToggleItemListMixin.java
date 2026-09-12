@@ -91,7 +91,11 @@ public class ToggleItemListMixin {
                     continue;
                 }
                 try {
-                    list.add(new ToggleItem(s, 9, 157 + added * 18, emptyTex));
+                    // Segunda columna (x=29) en las filas libres del panel:
+                    // queda dentro del area visible sin estirar el fondo.
+                    int[] rows = {11, 29, 47, 65, 83, 101};
+                    int y = (added < rows.length) ? rows[added] : 101 + (added - 5) * 18;
+                    list.add(new ToggleItem(s, 29, y, emptyTex));
                     added++;
                 } catch (Throwable t) {
                     // seguir con el siguiente slot

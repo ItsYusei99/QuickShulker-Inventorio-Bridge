@@ -76,50 +76,23 @@ public class ToggleScreenMixin {
 
     @Inject(method = "init", at = @At("HEAD"), require = 0)
     private void qsbridge$onInitHead(CallbackInfo ci) {
-        qsbridge$fitLayout();
-    }
-
-    @Inject(method = "renderBackground", at = @At("HEAD"), require = 0)
-    private void qsbridge$onRenderBackgroundHead(
-            net.minecraft.client.gui.GuiGraphics guiGraphics, int mouseX, int mouseY,
-            float partialTick, CallbackInfo ci) {
-        // Garantiza el tamaño en cada frame: init() puede correr antes de
-        // que la lista tenga sus entradas finales.
-        qsbridge$fitLayout();
-    }
-
-    @Inject(method = "renderBackground", at = @At("TAIL"), require = 0)
-    private void qsbridge$onRenderBackgroundTail(
-            net.minecraft.client.gui.GuiGraphics guiGraphics, int mouseX, int mouseY,
-            float partialTick, CallbackInfo ci) {
-        // La textura del panel mide 176x166 dentro de un archivo de 256x256:
-        // estirar el blit NO mueve el borde visible (siempre queda en y=166).
-        // Se rellena la extension con el color de fondo y se redibuja el
-        // borde inferior con la franja original de la textura.
         try {
-            int n = (this.toggleItems == null) ? 6 : Math.max(6, this.toggleItems.size());
-            int extra = Math.max(0, n - 6) * 18;
-            if (extra <= 0) {
-                return;
+            java.util.List<ToggleItem> items = null;
+            if (this.player != null) {
+                try {
+                    items = HandlerToggleEnchantments.itemList(this.player);
+                } catch (Throwable t) {
+                    items = null;
+                }
             }
-            int x0 = this.leftPos;
-            int y166 = this.topPos + 166;
-            int yEnd = this.topPos + this.imageHeight;
-            // Fondo interior (mismo tono oliva del panel). Solo fills, sin
-            // texturas: un blit aqui rompia el registro con GeckoLib/Continuity.
-            guiGraphics.fill(x0, y166, x0 + this.imageWidth, yEnd, 0xFF544C3B);
-            // Bordes laterales negros de 1px.
-            guiGraphics.fill(x0, y166, x0 + 1, yEnd, 0xFF000000);
-            guiGraphics.fill(x0 + this.imageWidth - 1, y166, x0 + this.imageWidth, yEnd,
-                    0xFF000000);
-            // Imitacion del borde inferior original (claro + oscuro + negro).
-            guiGraphics.fill(x0 + 1, yEnd - 3, x0 + this.imageWidth - 1, yEnd - 2,
-                    0xFFC6C6C6);
-            guiGraphics.fill(x0 + 1, yEnd - 2, x0 + this.imageWidth - 1, yEnd - 1,
-                    0xFF555555);
-            guiGraphics.fill(x0, yEnd - 1, x0 + this.imageWidth, yEnd, 0xFF000000);
+            int n = (items == null) ? 6 : Math.max(6, items.size());
+            if (this.chooseItem == null || this.chooseItem.length < n) {
+                this.chooseItem = new ButtonWidget[Math.max(64, n + 8)];
+            }
+            this.imageHeight = 166 + Math.max(0, n - 6) * 18;
         } catch (Throwable t) {
-            // fail-open
+            // fail-open: pantalla vainilla intacta
         }
     }
+}
 }
