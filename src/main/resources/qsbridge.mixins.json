@@ -4,7 +4,11 @@
   "package": "com.itsyusei.qsbridge.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "HostSlotResolverMixin"
+    "HostSlotResolverMixin",
+    "ToggleItemListMixin"
+  ],
+  "client": [
+    "ToggleScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 0
