@@ -105,15 +105,19 @@ public class ToggleScreenMixin {
             int x0 = this.leftPos;
             int y166 = this.topPos + 166;
             int yEnd = this.topPos + this.imageHeight;
-            // Fondo interior (mismo tono oliva del panel).
+            // Fondo interior (mismo tono oliva del panel). Solo fills, sin
+            // texturas: un blit aqui rompia el registro con GeckoLib/Continuity.
             guiGraphics.fill(x0, y166, x0 + this.imageWidth, yEnd, 0xFF544C3B);
             // Bordes laterales negros de 1px.
             guiGraphics.fill(x0, y166, x0 + 1, yEnd, 0xFF000000);
             guiGraphics.fill(x0 + this.imageWidth - 1, y166, x0 + this.imageWidth, yEnd,
                     0xFF000000);
-            // Franja del borde inferior original (6px altos de la textura).
-            guiGraphics.blit(this.CONTAINER, x0, yEnd - 6, 0.0F, 160.0F,
-                    this.imageWidth, 6, 256, 256);
+            // Imitacion del borde inferior original (claro + oscuro + negro).
+            guiGraphics.fill(x0 + 1, yEnd - 3, x0 + this.imageWidth - 1, yEnd - 2,
+                    0xFFC6C6C6);
+            guiGraphics.fill(x0 + 1, yEnd - 2, x0 + this.imageWidth - 1, yEnd - 1,
+                    0xFF555555);
+            guiGraphics.fill(x0, yEnd - 1, x0 + this.imageWidth, yEnd, 0xFF000000);
         } catch (Throwable t) {
             // fail-open
         }
