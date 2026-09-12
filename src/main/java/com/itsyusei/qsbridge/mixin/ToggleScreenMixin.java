@@ -36,23 +36,40 @@ public class ToggleScreenMixin {
     @Shadow
     public LocalPlayer player;
 
-    @Inject(method = "init", at = @At("HEAD"), require = 0)
-    private void qsbridge$onInitHead(CallbackInfo ci) {
+    @Shadow
+    public java.util.List<ToggleItem> toggleItems;
+
+    private void qsbridge$fitLayout() {
         try {
-            if (this.player == null) {
-                return;
-            }
-            List<ToggleItem> items;
-            try {
-                items = HandlerToggleEnchantments.itemList(this.player);
-            } catch (Throwable t) {
-                return;
+            java.util.List<ToggleItem> items = this.toggleItems;
+            if (items == null && this.player != null) {
+                try {
+                    items = HandlerToggleEnchantments.itemList(this.player);
+                } catch (Throwable t) {
+                    items = null;
+                }
             }
             int n = (items == null) ? 6 : Math.max(6, items.size());
-            this.chooseItem = new ButtonWidget[Math.max(64, n + 8)];
+            if (this.chooseItem == null || this.chooseItem.length < n) {
+                this.chooseItem = new ButtonWidget[Math.max(64, n + 8)];
+            }
             this.imageHeight = 166 + Math.max(0, n - 6) * 18;
         } catch (Throwable t) {
             // fail-open: pantalla vainilla intacta
         }
+    }
+
+    @Inject(method = "init", at = @At("HEAD"), require = 0)
+    private void qsbridge$onInitHead(CallbackInfo ci) {
+        qsbridge$fitLayout();
+    }
+
+    @Inject(method = "renderBackground", at = @At("HEAD"), require = 0)
+    private void qsbridge$onRenderBackgroundHead(
+            net.minecraft.client.gui.GuiGraphics guiGraphics, int mouseX, int mouseY,
+            float partialTick, CallbackInfo ci) {
+        // Garantiza el tamaño en cada frame: init() puede correr antes de
+        // que la lista tenga sus entradas finales.
+        qsbridge$fitLayout();
     }
 }
