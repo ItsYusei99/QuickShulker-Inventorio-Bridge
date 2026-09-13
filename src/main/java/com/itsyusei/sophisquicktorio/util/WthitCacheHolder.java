@@ -1,4 +1,4 @@
-package com.itsyusei.sophisquicktorio.mixin;
+package com.itsyusei.sophisquicktorio.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,6 +23,8 @@ public final class WthitCacheHolder {
     private WthitCacheHolder() {
     }
 
+    private static boolean sqtErrLogged = false;
+
     public static synchronized IItemHandler getHandler(ServerLevel world, BlockPos pos) {
         if (cache == null || cache.level() != world || !cache.pos().equals(pos)) {
             cache = BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, world, pos, null);
@@ -30,7 +32,12 @@ public final class WthitCacheHolder {
         IItemHandler handler = null;
         try {
             handler = cache.getCapability();
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            if (!sqtErrLogged) {
+                sqtErrLogged = true;
+                com.itsyusei.sophisquicktorio.SophisQuickTorio.LOGGER.warn(
+                        "[sqt] null-context capability failed, using sides", t);
+            }
         }
         if (handler != null) {
             return handler;
