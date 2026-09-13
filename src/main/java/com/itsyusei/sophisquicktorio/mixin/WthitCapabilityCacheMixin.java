@@ -33,7 +33,7 @@ public class WthitCapabilityCacheMixin {
         try {
             var world = accessor.getLevel();
             var pos = accessor.getTarget().getBlockPos();
-            var handler = WthitCacheHolder.get(world, pos).getCapability();
+            var handler = WthitCacheHolder.getHandler(world, pos);
             if (handler == null) {
                 ci.cancel();
                 return;
