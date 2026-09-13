@@ -65,6 +65,10 @@ public class ToggleItemListMixin {
             }
             int added = 0;
             for (ItemStack stack : belt) {
+                // Maximo 5 (filas 157..229 del panel extendido a 256).
+                if (added >= 5) {
+                    break;
+                }
                 ItemStack s;
                 try {
                     s = stack;
@@ -91,11 +95,9 @@ public class ToggleItemListMixin {
                     continue;
                 }
                 try {
-                    // Segunda columna (x=29) en las filas libres del panel:
-                    // queda dentro del area visible sin estirar el fondo.
-                    int[] rows = {11, 29, 47, 65, 83, 101};
-                    int y = (added < rows.length) ? rows[added] : 101 + (added - 5) * 18;
-                    list.add(new ToggleItem(s, 29, y, emptyTex));
+                    // Columna original (x=9), debajo de las 6 vainilla:
+                    // el fondo extendido por resource pack llega hasta y=256.
+                    list.add(new ToggleItem(s, 9, 157 + added * 18, emptyTex));
                     added++;
                 } catch (Throwable t) {
                     // seguir con el siguiente slot
