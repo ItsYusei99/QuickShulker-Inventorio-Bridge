@@ -1,4 +1,4 @@
-# SophisQuickTorio
+# ShulkerBridge
 
 NeoForge 1.21.1 bridge mod: makes **QuickShulker** work with **Inventorio** rows and
 **Sophisticated Storage** shulkers, and adds **ToolBelt** tools to **Toggle Enchantments**.
