@@ -112,6 +112,10 @@ dependencies {
     compileOnly files("libs/togenc.jar")
     // Compile-only reference to WTHIT (mixin target). Present at runtime.
     compileOnly files("libs/wthit.jar")
+    // Compile-only references to Sophisticated mods (item-menu support). Present at runtime.
+    compileOnly files("libs/sophisticatedcore.jar")
+    compileOnly files("libs/sophisticatedstorage.jar")
+    compileOnly files("libs/sophisticatedbackpacks.jar")
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

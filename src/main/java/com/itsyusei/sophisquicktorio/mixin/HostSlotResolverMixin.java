@@ -1,9 +1,9 @@
-package com.itsyusei.qsbridge.mixin;
+package com.itsyusei.sophisquicktorio.mixin;
 
 import com.ice2974.quickshulkerneoforged.common.open.HostSlotRef;
 import com.ice2974.quickshulkerneoforged.common.open.HostStorageScope;
 import com.ice2974.quickshulkerneoforged.neoforge.NeoForgeHostSlotResolver;
-import com.itsyusei.qsbridge.QSBridge;
+import com.itsyusei.sophisquicktorio.SophisQuickTorio;
 import de.rubixdev.inventorio.api.InventorioAPI;
 import de.rubixdev.inventorio.player.PlayerInventoryAddon;
 import net.minecraft.world.Container;
@@ -56,6 +56,15 @@ public class HostSlotResolverMixin {
         }
     }
 
+    private static boolean isSophMenu(AbstractContainerMenu menu) {
+        try {
+            String name = menu.getClass().getName();
+            return name.startsWith("net.p3pp3rf1y.sophisticated");
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
     /** Marker protocol: menu-independent refs use menuSlotIndex == -1. */
     private static boolean isBridgeRef(HostSlotRef ref) {
         try {
@@ -79,7 +88,7 @@ public class HostSlotResolverMixin {
 
     /** Client (and bundling entry): resolve shulkers in Inventorio rows. */
     @Inject(method = "forPlayerInventorySlot", at = @At("RETURN"), cancellable = true, require = 0)
-    private static void qsbridge$onResolve(Player player, AbstractContainerMenu menu, Slot slot,
+    private static void sqt$onResolve(Player player, AbstractContainerMenu menu, Slot slot,
             CallbackInfoReturnable<Optional<HostSlotRef>> cir) {
         try {
             if (cir.getReturnValue() != null && cir.getReturnValue().isPresent()) {
@@ -106,7 +115,7 @@ public class HostSlotResolverMixin {
             } catch (Throwable t) {
                 return;
             }
-            QSBridge.LOGGER.info("[qsbridge] resolve Inventorio slot {} ({})",
+            SophisQuickTorio.LOGGER.info("[sqt] resolve Inventorio slot {} ({})",
                     containerIdx, stack.getItem());
             cir.setReturnValue(Optional.of(new HostSlotRef(
                     HostStorageScope.PLAYER_CONTAINER_MENU, containerIdx, -1)));
@@ -115,9 +124,53 @@ public class HostSlotResolverMixin {
         }
     }
 
+    /** Client: menu-slot refs for slots inside Soph screens (storage area). */
+    @Inject(method = "forPlayerInventorySlot", at = @At("RETURN"), cancellable = true, require = 0)
+    private static void sqt$onResolveSophMenu(Player player, AbstractContainerMenu menu, Slot slot,
+            CallbackInfoReturnable<Optional<HostSlotRef>> cir) {
+        try {
+            if (cir.getReturnValue() != null && cir.getReturnValue().isPresent()) {
+                return;
+            }
+            if (player == null || menu == null || slot == null) {
+                return;
+            }
+            if (!isSophMenu(menu)) {
+                return;
+            }
+            ItemStack stack;
+            try {
+                stack = slot.getItem();
+            } catch (Throwable t) {
+                return;
+            }
+            if (stack == null || stack.isEmpty()) {
+                return;
+            }
+            int menuIdx;
+            try {
+                menuIdx = slot.index;
+            } catch (Throwable t) {
+                return;
+            }
+            int logical = menuIdx;
+            try {
+                logical = slot.getContainerSlot();
+            } catch (Throwable t) {
+                // keep menu index
+            }
+            SophisQuickTorio.LOGGER.info("[sqt] resolve Soph menu slot {} ({})",
+                    menuIdx, stack.getItem());
+            cir.setReturnValue(Optional.of(new HostSlotRef(
+                    HostStorageScope.PLAYER_CONTAINER_MENU, logical, menuIdx)));
+        } catch (Throwable t) {
+            // fail-open: keep vanilla behavior
+        }
+    }
+
     /** Server: resolve bridge refs straight from the addon (menu-independent). */
     @Inject(method = "resolve", at = @At("RETURN"), cancellable = true, require = 0)
-    private static void qsbridge$onResolveStack(Player player, HostSlotRef ref,
+    private static void sqt$onResolveStack(Player player, HostSlotRef ref,
             CallbackInfoReturnable<ItemStack> cir) {
         try {
             ItemStack cur = cir.getReturnValue();
@@ -140,7 +193,7 @@ public class HostSlotResolverMixin {
             if (found == null || found.isEmpty()) {
                 return;
             }
-            QSBridge.LOGGER.info("[qsbridge] resolve addon idx={} -> {}",
+            SophisQuickTorio.LOGGER.info("[sqt] resolve addon idx={} -> {}",
                     idx, found.getItem());
             cir.setReturnValue(found);
         } catch (Throwable t) {
@@ -150,7 +203,7 @@ public class HostSlotResolverMixin {
 
     /** Server: write back through the addon for bridge refs. */
     @Inject(method = "set", at = @At("HEAD"), cancellable = true, require = 0)
-    private static void qsbridge$onSet(Player player, HostSlotRef ref, ItemStack stack,
+    private static void sqt$onSet(Player player, HostSlotRef ref, ItemStack stack,
             CallbackInfo ci) {
         try {
             if (!isBridgeRef(ref)) {
@@ -165,7 +218,7 @@ public class HostSlotResolverMixin {
             if (idx < 0 || idx >= c.getContainerSize()) {
                 return;
             }
-            QSBridge.LOGGER.info("[qsbridge] set addon idx={} -> {}",
+            SophisQuickTorio.LOGGER.info("[sqt] set addon idx={} -> {}",
                     idx, stack == null ? "null" : stack.getItem());
             c.setItem(idx, stack == null ? ItemStack.EMPTY : stack);
             ci.cancel();
@@ -174,19 +227,18 @@ public class HostSlotResolverMixin {
         }
     }
 
-    /** Server: accept Inventorio addon containers when resolving menu slots. */
-    @Inject(method = "resolveMenuSlot", at = @At("HEAD"), cancellable = false, require = 0)
-    private static void qsbridge$onResolveMenuHead(AbstractContainerMenu menu, HostSlotRef ref,
+    /** Server: accept Inventorio addon containers when resolving menu slots. */    @Inject(method = "resolveMenuSlot", at = @At("HEAD"), cancellable = false, require = 0)
+    private static void sqt$onResolveMenuHead(AbstractContainerMenu menu, HostSlotRef ref,
             CallbackInfoReturnable<Optional<Slot>> cir) {
         try {
-            QSBridge.LOGGER.info("[qsbridge] resolveMenuSlot menu={} idx={} slots={}",
+            SophisQuickTorio.LOGGER.info("[sqt] resolveMenuSlot menu={} idx={} slots={}",
                     menu == null ? "null" : menu.getClass().getName(),
                     ref == null ? -999 : ref.menuSlotIndex(),
                     menu == null ? -1 : menu.slots.size());
             if (menu != null && ref != null && ref.menuSlotIndex() >= 0
                     && ref.menuSlotIndex() < menu.slots.size()) {
                 net.minecraft.world.inventory.Slot s = menu.slots.get(ref.menuSlotIndex());
-                QSBridge.LOGGER.info("[qsbridge] slot={} container={} item={}",
+                SophisQuickTorio.LOGGER.info("[sqt] slot={} container={} item={}",
                         s == null ? "null" : s.getClass().getName(),
                         (s == null || s.container == null) ? "null" : s.container.getClass().getName(),
                         (s == null) ? "?" : String.valueOf(s.getItem().getItem()));
@@ -197,7 +249,7 @@ public class HostSlotResolverMixin {
     }
 
     @Inject(method = "resolveMenuSlot", at = @At("RETURN"), cancellable = true, require = 0)
-    private static void qsbridge$onResolveMenu(AbstractContainerMenu menu, HostSlotRef ref,
+    private static void sqt$onResolveMenu(AbstractContainerMenu menu, HostSlotRef ref,
             CallbackInfoReturnable<Optional<Slot>> cir) {
         try {
             if (cir.getReturnValue() != null && cir.getReturnValue().isPresent()) {
@@ -215,7 +267,7 @@ public class HostSlotResolverMixin {
                 try {
                     if (s != null && s.container != null && isInventorioSlot(s)
                             && s.getContainerSlot() == want) {
-                        QSBridge.LOGGER.info("[qsbridge] bundling slot inventorio idx={}", want);
+                        SophisQuickTorio.LOGGER.info("[sqt] bundling slot inventorio idx={}", want);
                         cir.setReturnValue(Optional.of(s));
                         return;
                     }
@@ -228,15 +280,15 @@ public class HostSlotResolverMixin {
         }
     }
 
-    /** Server: treat the Inventorio menu as a supported bundling menu. */
+    /** Server: treat Inventorio and Soph menus as supported bundling menus. */
     @Inject(method = "isSupportedBundlingMenu", at = @At("RETURN"), cancellable = true, require = 0)
-    private static void qsbridge$onSupported(AbstractContainerMenu menu,
+    private static void sqt$onSupported(AbstractContainerMenu menu,
             CallbackInfoReturnable<Boolean> cir) {
         try {
             if (cir.getReturnValue() != null && cir.getReturnValue()) {
                 return;
             }
-            if (isInventorioMenu(menu)) {
+            if (isInventorioMenu(menu) || isSophMenu(menu)) {
                 cir.setReturnValue(true);
             }
         } catch (Throwable t) {

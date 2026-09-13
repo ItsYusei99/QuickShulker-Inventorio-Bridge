@@ -1,4 +1,4 @@
-package com.itsyusei.qsbridge.mixin;
+package com.itsyusei.sophisquicktorio.mixin;
 
 import com.dplayend.togenc.client.ToggleScreen;
 import com.dplayend.togenc.util.ButtonWidget;
@@ -32,7 +32,7 @@ public class ToggleScreenMixin {
     public LocalPlayer player;
 
     @Inject(method = "init", at = @At("HEAD"), require = 0)
-    private void qsbridge$onInitHead(CallbackInfo ci) {
+    private void sqt$onInitHead(CallbackInfo ci) {
         // 256 = altura del panel extendido por resource pack. Sin tocar
         // el render: solo arreglo + altura en init (combinacion que abria).
         try {

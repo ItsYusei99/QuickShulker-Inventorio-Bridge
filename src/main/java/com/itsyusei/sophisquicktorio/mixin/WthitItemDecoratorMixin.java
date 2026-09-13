@@ -1,4 +1,4 @@
-package com.itsyusei.qsbridge.mixin;
+package com.itsyusei.sophisquicktorio.mixin;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -30,7 +30,7 @@ public class WthitItemDecoratorMixin {
             ),
             require = 0
     )
-    private static void qsbridge$skipVanillaCount(GuiGraphics graphics, Font font,
+    private static void sqt$skipVanillaCount(GuiGraphics graphics, Font font,
             ItemStack stack, int x, int y, String text) {
         try {
             if (stack != null && stack.getCount() > 999) {

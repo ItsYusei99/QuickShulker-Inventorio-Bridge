@@ -1,8 +1,8 @@
-package com.itsyusei.qsbridge.mixin;
+package com.itsyusei.sophisquicktorio.mixin;
 
 import com.dplayend.togenc.handler.HandlerToggleEnchantments;
 import com.dplayend.togenc.util.ToggleItem;
-import com.itsyusei.qsbridge.QSBridge;
+import com.itsyusei.sophisquicktorio.SophisQuickTorio;
 import de.rubixdev.inventorio.api.InventorioAPI;
 import de.rubixdev.inventorio.player.PlayerInventoryAddon;
 import de.rubixdev.inventorio.player.inventory.PlayerInventoryExtension;
@@ -31,7 +31,7 @@ import java.util.List;
 public class ToggleItemListMixin {
 
     @Inject(method = "itemList", at = @At("RETURN"), cancellable = true, require = 0)
-    private static void qsbridge$onItemList(Player player,
+    private static void sqt$onItemList(Player player,
             CallbackInfoReturnable<List<ToggleItem>> cir) {
         try {
             List<ToggleItem> list = cir.getReturnValue();
@@ -104,7 +104,7 @@ public class ToggleItemListMixin {
                 }
             }
             if (added > 0) {
-                QSBridge.LOGGER.info("[qsbridge] togenc: {} herramientas de Inventorio añadidas",
+                SophisQuickTorio.LOGGER.info("[sqt] togenc: {} herramientas de Inventorio añadidas",
                         added);
             }
             cir.setReturnValue(list);

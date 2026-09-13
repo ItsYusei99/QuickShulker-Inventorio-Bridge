@@ -1,70 +1,43 @@
-# QuickShulker × Inventorio Bridge
+# SophisQuickTorio
 
-<p align="center">
-  <img src="icon.png" alt="QuickShulker Inventorio Bridge Logo" width="160" height="160" />
-</p>
+NeoForge 1.21.1 bridge mod: makes **QuickShulker** work with **Inventorio** rows and
+**Sophisticated Storage** shulkers, and adds **ToolBelt** tools to **Toggle Enchantments**.
 
-<p align="center">
-  <a href="https://neoforged.net/"><img src="https://img.shields.io/badge/NeoForge-1.21.1-orange.svg?style=for-the-badge&logo=neoforge" alt="NeoForge 1.21.1" /></a>
-  <a href="https://minecraft.net/"><img src="https://img.shields.io/badge/Minecraft-1.21.1-brightgreen.svg?style=for-the-badge&logo=minecraft" alt="Minecraft 1.21.1" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License: MIT" /></a>
-  <a href="https://github.com/itsyusei99"><img src="https://img.shields.io/badge/Author-itsyusei99-purple.svg?style=for-the-badge" alt="Author: itsyusei99" /></a>
-</p>
+## What it fixes
 
----
+1. **QuickShulker × Inventorio** — QuickShulker only knows the vanilla 36-slot
+   inventory. Shulkers stored in Inventorio rows (Deep Pockets, ToolBelt, …) can now be
+   quick-opened (`K` / right-click), including insert/extract/drag bundling.
+2. **QuickShulker × Sophisticated Storage** — QuickShulker hardcodes the 17 vanilla
+   shulkers. All 6 Soph shulkers (basic → netherite) open with the full Soph UI:
+   - in hand (right-click, `Shift` still places the block),
+   - hovered in any inventory (`K` / right-click),
+   - in Inventorio rows,
+   - nested inside open Soph screens (backpacks, storages).
+3. **QuickShulker in Soph screens** — vanilla openables (crafting table, stonecutter,
+   ender chest, anvil, vanilla shulkers) can be quick-opened from slots inside
+   Sophisticated screens.
+4. **Toggle Enchantments × ToolBelt** — tools in the Inventorio ToolBelt show up in
+   the toggle list (the screen also grows past its hardcoded 6 rows).
 
-A lightweight NeoForge compatibility mod that allows **QuickShulker** to interact with all custom inventory slots added by **Inventorio** (such as Deep Pockets and ToolBelt).
+Everything is fail-open (`require = 0` mixins + `try/catch`): if a target mod is
+missing or changes, vanilla behavior is preserved.
 
-Without this bridge, QuickShulker only recognizes the standard 36 vanilla inventory slots, causing right-clicking or keybind-opening shulker boxes inside Inventorio's extra rows to fail or close abruptly.
+## Install
 
----
+Put the same jar in **client and server** `mods/` (needs QuickShulker, Inventorio,
+Sophisticated Core/Storage/Backpacks, Toggle Enchantments present to activate each
+bridge — every bridge enables independently).
 
-## ✨ Features
-
-- **Right-Click & Keybind Opening**: Open shulker boxes directly from Inventorio's **Deep Pockets** or **ToolBelt** rows with a simple right-click or using your configured QuickShulker hotkey (`K`).
-- **Item Bundling Support**: Drag or click items over shulkers in Inventorio rows to insert or extract items on the fly.
-- **Menu-Independent Session Validation**: Prevents the server from dropping or rejecting shulker interactions when switching between the inventory screen and the shulker interface.
-- **Fail-Open Safety**: Built with isolated, fail-open Mixins (`require = 0`). If either mod is updated or uninstalled, vanilla behavior is completely preserved without crashes.
-- **Full Multiplayer & Dedicated Server Support**: Works seamlessly in both Singleplayer and Dedicated Server environments.
-
----
-
-## 📋 Requirements
-
-| Mod | Version | Loader |
-| :--- | :--- | :--- |
-| **Minecraft** | `1.21.1` | — |
-| **NeoForge** | `21.1.249` (or newer `21.1.x`) | NeoForge |
-| **QuickShulker NeoForged** | `1.0.0`+ | NeoForge |
-| **Inventorio** | `1.11.0`+ | NeoForge |
-
----
-
-## 📥 Installation
-
-1. Make sure you have **NeoForge 1.21.1** installed.
-2. Install **QuickShulker NeoForged** and **Inventorio**.
-3. Drop `qsbridge-1.0.0.jar` into your `.minecraft/mods` folder (both client and server if playing multiplayer).
-4. Launch the game and enjoy!
-
----
-
-## 🛠️ Building from Source
-
-This project uses NeoGradle with Java 21:
+## Build
 
 ```bash
-git clone https://github.com/itsyusei99/QuickShulker-Inventorio-Bridge.git
-cd QuickShulker-Inventorio-Bridge
-./gradlew build
+./gradlew build --offline
 ```
 
-The compiled JAR will be located at `build/libs/qsbridge-1.0.0.jar`.
+`compileOnly` references live in `libs/` (present at runtime). Java 21, NeoForge 21.1.249.
 
----
+## Credits
 
-## 📄 License
-
-This mod is available under the **MIT License**. Feel free to use it in any modpack!
-
-Created by **[itsyusei99](https://github.com/itsyusei99)**.
+- QuickShulker NeoForged, Inventorio, Sophisticated mods, Toggle Enchantments authors.
+- Bridge by ItsYusei99.
