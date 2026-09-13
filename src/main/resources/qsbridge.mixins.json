@@ -8,7 +8,8 @@
     "ToggleItemListMixin"
   ],
   "client": [
-    "ToggleScreenMixin"
+    "ToggleScreenMixin",
+    "WthitItemDecoratorMixin"
   ],
   "injectors": {
     "defaultRequire": 0
