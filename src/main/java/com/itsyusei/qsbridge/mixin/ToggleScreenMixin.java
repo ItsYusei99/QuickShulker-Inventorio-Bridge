@@ -2,6 +2,7 @@ package com.itsyusei.qsbridge.mixin;
 
 import com.dplayend.togenc.client.ToggleScreen;
 import com.dplayend.togenc.util.ButtonWidget;
+import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
